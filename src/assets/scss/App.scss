@@ -4,8 +4,8 @@
 @import "custom";
 
 :root {
-  --bs-font-sans-serif: 'Roboto', sans-serif;
-  --bs-primary: $primary-color;
+  --cs-font-sans-serif: 'Roboto', sans-serif;
+  --cs-primary: $primary-color;
 }
 
 #root {
@@ -71,6 +71,10 @@ tbody > tr > td {
   vertical-align: middle;
 }
 
+.sort-row {
+  cursor: pointer;
+}
+
 footer {
   background-color: $quaternary-color;
   width: auto;
@@ -80,6 +84,43 @@ footer {
   text-align: center;
   padding: 1em;
   box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.12), 0 -3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-display {
+  max-height: 500px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.modal-title {
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+}
+
+.btn-primary:hover {
+  background-color: $secondary-color;
+  border-color: $secondary-color;
+  text-shadow: 1px 1px 2px #1a1d20;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: .5s;
+}
+
+.btn-secondary {
+  background-color: $tertiary-color;
+  border-color: $tertiary-color;
+  color: #393e46;
+}
+
+.btn-secondary:hover {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  text-shadow: 1px 1px 2px #1a1d20;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: .5s;
 }
 
 @media only screen and (max-width: 900px) {
