@@ -1,6 +1,6 @@
 import '../assets/scss/App.scss'
 import { useEffect, useState } from "react"
-import { Button, Carousel, Container, Modal, Navbar, Spinner, Table } from "react-bootstrap"
+import { Button, Carousel, Container, Form, Modal, Navbar, Spinner, Table } from "react-bootstrap"
 
 const App = () => {
     /** STATE FOR PARSING THE JSON FILE THE FIRST TIME */
@@ -40,8 +40,12 @@ const App = () => {
         if (sortConfig.key) {
             const aValue = a[sortConfig.key] || ''
             const bValue = b[sortConfig.key] || ''
-            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
-            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+            if (aValue < bValue) {
+                return sortConfig.direction === 'asc' ? -1 : 1
+            }
+            if (aValue > bValue) {
+                return sortConfig.direction === 'asc' ? 1 : -1
+            }
         }
         return 0
     })
@@ -69,6 +73,11 @@ const App = () => {
         setSelectedPhotos(photos)
         setCurrentLocation(location)
         setShowModal(true)
+    }
+
+    /** SET FREE VALUES INTO COLUMN */
+    const searchFreeAttractions = (desc) => {
+        return desc.toLowerCase().includes('free')
     }
 
     return (
@@ -102,6 +111,16 @@ const App = () => {
                 </form>
             </div>
 
+            {/* FILTER (Rating, Tags and Free) */}
+            {/* TODO: FINNISH THIS */}
+            <Form>
+                <Form.Check
+                    type="switch"
+                    id="custom-switch"
+                    label="Free activities only"
+                />
+            </Form>
+
             {/* CONTENT TABLE */}
             <div className={"content-custom"}>
                 <div>
@@ -109,52 +128,56 @@ const App = () => {
                         <Spinner className={"spinner-custom"} animation={"border"} variant={"primary"}/>
                     )}
                     {filteredLocations.length > 0 && (
-                        <Table striped bordered hover responsive>
-                            <thead>
-                            <tr>
-                                <th className={"sort-row"} onClick={() => handleSort('id')}>ID {getSortIcon('id')}</th>
-                                <th className={"sort-row"}
-                                    onClick={() => handleSort('name')}>Name {getSortIcon('name')}</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                                <th>Address</th>
-                                <th>Description</th>
-                                <th>Phone Number</th>
-                                <th>Images</th>
-                                <th>Tags</th>
-                                <th className={"sort-row"}
-                                    onClick={() => handleSort('rating')}>Rating {getSortIcon('rating')}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {filteredLocations.map(item => (
-                                <tr key={item.id}>
-                                    <td>{item.id}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.latitude}</td>
-                                    <td>{item.longitude}</td>
-                                    <td>{item.address}</td>
-                                    <td>{item.description}</td>
-                                    <td>{item.phoneNumber ? item.phoneNumber : "N/A"}</td>
-                                    <td>
-                                        {item.photosURLs && item.photosURLs.length > 0 ? (
-                                            <Button onClick={() => handleShowModal(item.photosURLs, item.name)}>
-                                                Images
-                                            </Button>
-                                        ) : ("No Images")}
-                                    </td>
-                                    <td>
-                                        {item.tags && item.tags.length > 0 ? (
-                                            item.tags.map((tag, index) => (
-                                                <span key={index}>{tag}{index < item.tags.length - 1 ? ', ' : ''}</span>
-                                            ))
-                                        ) : ("No Tags")}
-                                    </td>
-                                    <td>{item.rating}</td>
+                        <div id="responsive-table">
+                            <Table striped bordered hover responsive>
+                                <thead>
+                                <tr>
+                                    <th className={"sort-row"} onClick={() => handleSort('id')}>ID {getSortIcon('id')}</th>
+                                    <th className={"sort-row"}
+                                        onClick={() => handleSort('name')}>Name {getSortIcon('name')}</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th>Address</th>
+                                    <th>Description</th>
+                                    <th>Phone Number</th>
+                                    <th>Images</th>
+                                    <th>Tags</th>
+                                    <th className={"sort-row"}
+                                        onClick={() => handleSort('rating')}>Rating {getSortIcon('rating')}</th>
+                                    <th>Free</th>
                                 </tr>
-                            ))}
-                            </tbody>
-                        </Table>
+                                </thead>
+                                <tbody>
+                                {filteredLocations.map(item => (
+                                    <tr key={item.id}>
+                                        <td data-title="id">{item.id}</td>
+                                        <td data-title="name">{item.name}</td>
+                                        <td data-title="latitude">{item.latitude}</td>
+                                        <td data-title="longitude">{item.longitude}</td>
+                                        <td data-title="address">{item.address}</td>
+                                        <td data-title="description">{item.description}</td>
+                                        <td data-title="phone-number">{item.phoneNumber ? item.phoneNumber : "N/A"}</td>
+                                        <td data-title="images">
+                                            {item.photosURLs && item.photosURLs.length > 0 ? (
+                                                <Button onClick={() => handleShowModal(item.photosURLs, item.name)}>
+                                                    Images
+                                                </Button>
+                                            ) : ("No Images")}
+                                        </td>
+                                        <td data-title="tags">
+                                            {item.tags && item.tags.length > 0 ? (
+                                                item.tags.map((tag, index) => (
+                                                    <span key={index}>{tag}{index < item.tags.length - 1 ? ', ' : ''}</span>
+                                                ))
+                                            ) : ("No Tags")}
+                                        </td>
+                                        <td data-title="rating">{item.rating}</td>
+                                        <td data-title="description">{searchFreeAttractions(item.description) ? 'Free' : "No"}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </Table>
+                        </div>
                     )}
                 </div>
 
