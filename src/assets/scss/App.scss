@@ -123,6 +123,12 @@ footer {
   transition: .5s;
 }
 
+#custom-switch {
+  cursor: pointer;
+}
+
+
+
 /* TABLE STACK CODE: https://stackoverflow.com/questions/28983809/how-to-make-a-table-responsive-stack-columns */
 @media only screen and (max-width: 1080px),
        only screen and (max-width: 900px),

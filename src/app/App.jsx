@@ -6,11 +6,22 @@ const App = () => {
     /** STATE FOR PARSING THE JSON FILE THE FIRST TIME */
     const [locations, setLocations] = useState([])
 
-    /** STATE FOR GETTING THE DATA FROM THE INPUT */
+    /** STATE FOR SEARCH BY NAME AND ADDRESS */
     const [searchQuery, setSearchQuery] = useState("")
 
     /** STATE FOR SORTING */
     const [sortConfig, setSortConfig] = useState({key: null, direction: 'asc'})
+
+    /** STATE FOR MODAL */
+    const [showModal, setShowModal] = useState(false)
+    const [selectedPhotos, setSelectedPhotos] = useState([])
+    const [currentLocation, setCurrentLocation] = useState("")
+
+    /** STATE FOR FILTER BY FREE ATTRACTIONS */
+    const [filterByFreeAttractions, setFilterByFreeAttractions] = useState(false)
+
+    /** STATE FOR FILTER BY TAGS */
+    const [filterByTags, setFilterByTags] = useState("")
 
     /** EFFECT TO FETCH AND SET THE DATA FROM JSON TO THE TABLE */
     useEffect(() => {
@@ -24,6 +35,11 @@ const App = () => {
     /** HANDLE SEARCH QUERY */
     const handleSearchChange = (query) => {
         setSearchQuery(query)
+    }
+
+    /** HANDLE SEARCH BY TAGS */
+    const handleTagsSearch = (query) => {
+        setFilterByTags(query)
     }
 
     /** HANDLE SORTING */
@@ -50,35 +66,47 @@ const App = () => {
         return 0
     })
 
-    /** FILTER THE LOCATIONS */
-    const filteredLocations = sortedLocations.filter(location =>
-        location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        location.address.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    /** SET FREE VALUES INTO COLUMN */
+    const searchFreeAttractions = (desc) => {
+        return desc.toLowerCase().includes('free')
+    }
 
     /** FUNCTION TO DISPLAY SORT ICON */
     const getSortIcon = (key) => {
-        if (sortConfig.key !== key) return null
+        if (sortConfig.key !== key) {
+            return null
+        }
         return sortConfig.direction === 'asc' ? '▲' : '▼'
     }
 
-    /** MODAL */
-    const [showModal, setShowModal] = useState(false)
-    const [selectedPhotos, setSelectedPhotos] = useState([])
-    const [currentLocation, setCurrentLocation] = useState("")
-
     /** FUNCTION TO OPEN MODAL */
     const handleShowModal = (photos, location) => {
-        // console.log(photos)
         setSelectedPhotos(photos)
         setCurrentLocation(location)
         setShowModal(true)
     }
 
-    /** SET FREE VALUES INTO COLUMN */
-    const searchFreeAttractions = (desc) => {
-        return desc.toLowerCase().includes('free')
+    /** HANDLE FREE ATTRACTIONS FILTER */
+    const handleFreeAttractions = () => {
+        setFilterByFreeAttractions(!filterByFreeAttractions)
     }
+
+    /** FILTER LOCATIONS BASED ON SEARCH QUERY AND FREE ATTRACTIONS */
+    const filteredLocations = sortedLocations.filter(location => {
+        const matchesSearchQuery =
+            location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            location.address.toLowerCase().includes(searchQuery.toLowerCase())
+
+        const matchesTags = filterByTags
+            ? location.tags.some(tag => tag.toLowerCase().includes(filterByTags.toLowerCase()))
+            : true
+
+        const matchesFreeAttractions = filterByFreeAttractions
+            ? searchFreeAttractions(location.description)
+            : true
+
+        return matchesSearchQuery && matchesTags && matchesFreeAttractions
+    })
 
     return (
         <>
@@ -97,29 +125,49 @@ const App = () => {
                 </Container>
             </Navbar>
 
-            {/* SEARCH BAR */}
             <div className={"space-around"}>
-                <form>
-                    <label htmlFor="searchLocation">Search By Name or Address</label>
-                    <input
-                        className={"search-field box-shadow-custom"}
-                        type="text"
-                        placeholder={"Search..."}
-                        value={searchQuery}
-                        onChange={e => handleSearchChange(e.target.value)}
-                    />
-                </form>
+                <div className={"row"}>
+                    <div className={"col-lg-3 col-md-6 col-sm-12 mb-3"}>
+                        {/* SEARCH BY NAME AND ADDRESS */}
+                        <form>
+                            <label htmlFor="searchLocation">Search By Name or Address</label>
+                            <input
+                                className={"search-field box-shadow-custom w-100"}
+                                type="text"
+                                placeholder={"Search..."}
+                                value={searchQuery}
+                                onChange={e => handleSearchChange(e.target.value)}
+                            />
+                        </form>
+                    </div>
+                    <div className={"col-lg-3 col-md-6 col-sm-12 mb-3"}>
+                        {/* SEARCH BY TAGS */}
+                        <form>
+                            <label htmlFor="searchTags">Search By Tags</label>
+                            <input
+                                className={"search-field box-shadow-custom w-100"}
+                                type="text"
+                                placeholder={"Search Tags..."}
+                                value={filterByTags}
+                                onChange={e => handleTagsSearch(e.target.value)}
+                            />
+                        </form>
+                    </div>
+                    <div className={"col-lg-3 col-md-6 col-sm-12 d-flex align-items-center"}>
+                        {/* FILTER BY FREE ATTRACTIONS */}
+                        <Form className={"w-100"}>
+                            <Form.Check
+                                className={"mt-2"}
+                                type="switch"
+                                id="custom-switch"
+                                label="Free activities only"
+                                onChange={handleFreeAttractions}
+                                checked={filterByFreeAttractions}
+                            />
+                        </Form>
+                    </div>
+                </div>
             </div>
-
-            {/* FILTER (Rating, Tags and Free) */}
-            {/* TODO: FINNISH THIS */}
-            <Form>
-                <Form.Check
-                    type="switch"
-                    id="custom-switch"
-                    label="Free activities only"
-                />
-            </Form>
 
             {/* CONTENT TABLE */}
             <div className={"content-custom"}>
@@ -132,7 +180,8 @@ const App = () => {
                             <Table striped bordered hover responsive>
                                 <thead>
                                 <tr>
-                                    <th className={"sort-row"} onClick={() => handleSort('id')}>ID {getSortIcon('id')}</th>
+                                    <th className={"sort-row"}
+                                        onClick={() => handleSort('id')}>ID {getSortIcon('id')}</th>
                                     <th className={"sort-row"}
                                         onClick={() => handleSort('name')}>Name {getSortIcon('name')}</th>
                                     <th>Latitude</th>
@@ -167,7 +216,8 @@ const App = () => {
                                         <td data-title="tags">
                                             {item.tags && item.tags.length > 0 ? (
                                                 item.tags.map((tag, index) => (
-                                                    <span key={index}>{tag}{index < item.tags.length - 1 ? ', ' : ''}</span>
+                                                    <span
+                                                        key={index}>{tag}{index < item.tags.length - 1 ? ', ' : ''}</span>
                                                 ))
                                             ) : ("No Tags")}
                                         </td>
@@ -190,11 +240,8 @@ const App = () => {
                         <Carousel>
                             {selectedPhotos.map((pic, index) => (
                                 <Carousel.Item key={index}>
-                                    <img
-                                        className={"d-block w-100 modal-display"}
-                                        src={pic}
-                                        alt={`Slide ${index + 1}`}
-                                    />
+                                    <img className={"d-block w-100 modal-display"} src={pic}
+                                         alt={`Slide ${index + 1}`}/>
                                 </Carousel.Item>
                             ))}
                         </Carousel>
@@ -205,10 +252,10 @@ const App = () => {
                 </Modal>
             </div>
             <footer className={"page-footer"}>
-                <h3>JOSE HENRIQUE PINTO JOANONI® - 2024/2025</h3>
+                <h4 className={"text-center footer-content"}>Interactive Dublin Locations Project</h4>
             </footer>
         </>
-    );
+    )
 }
 
 export default App
