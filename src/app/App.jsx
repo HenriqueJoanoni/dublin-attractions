@@ -1,6 +1,6 @@
 import '../assets/scss/App.scss'
 import { useEffect, useState } from "react"
-import { Button, Carousel, Container, Form, Modal, Navbar, Spinner, Table } from "react-bootstrap"
+import { Button, Carousel, Container, Form, Modal, Navbar, Spinner, Table, Pagination } from "react-bootstrap"
 
 const App = () => {
     /** STATE FOR PARSING THE JSON FILE THE FIRST TIME */
@@ -22,6 +22,10 @@ const App = () => {
 
     /** STATE FOR FILTER BY TAGS */
     const [filterByTags, setFilterByTags] = useState("")
+
+    /** STATE FOR PAGINATION */
+    const [postsPerPage] = useState(10)
+    const [currentPage, setCurrentPage] = useState(1)
 
     /** EFFECT TO FETCH AND SET THE DATA FROM JSON TO THE TABLE */
     useEffect(() => {
@@ -107,6 +111,31 @@ const App = () => {
 
         return matchesSearchQuery && matchesTags && matchesFreeAttractions
     })
+
+    /**********************************************************************************************************
+     *                                  BELOW CODE CODE BASED ON:                                             *
+     * - https://medium.com/@techvoot.solutions/how-to-implement-pagination-in-your-react-js-e6b53043c84e     *
+     * - https://dev.to/canhamzacode/how-to-implement-pagination-with-reactjs-2b04                            *
+     *                                                                                                        *
+     **********************************************************************************************************/
+
+    /** CALCULATE INDEX FROM LAST AND FIRST ATTRACTIONS */
+    const indexOfLastPost = currentPage * postsPerPage
+    const indexOfFirstPost = indexOfLastPost - postsPerPage
+
+    /** SELECT THE CURRENT ATTRACTIONS */
+    const currentPosts = filteredLocations.slice(indexOfFirstPost, indexOfLastPost)
+
+    /** GENERATE PAGINATION NUMBERS */
+    const handlePagination = (length) => {
+        const paginationNumbers = []
+        for (let i = 1; i <= Math.ceil(length / postsPerPage); i++) {
+            paginationNumbers.push(i)
+        }
+        return paginationNumbers
+    }
+
+    const paginationNumbers = handlePagination(filteredLocations.length)
 
     return (
         <>
@@ -197,7 +226,7 @@ const App = () => {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {filteredLocations.map(item => (
+                                {currentPosts.map(item => (
                                     <tr key={item.id}>
                                         <td data-title="id">{item.id}</td>
                                         <td data-title="name">{item.name}</td>
@@ -227,6 +256,15 @@ const App = () => {
                                 ))}
                                 </tbody>
                             </Table>
+                            <Pagination className={"pagination-custom"}>
+                                {paginationNumbers.map(number => (
+                                    <Pagination.Item key={number} active={number === currentPage}
+                                                     onClick={() => setCurrentPage(number)}
+                                                     className={number === currentPage ? "active-pagination" : ""}>
+                                        {number}
+                                    </Pagination.Item>
+                                ))}
+                            </Pagination>
                         </div>
                     )}
                 </div>
@@ -252,7 +290,7 @@ const App = () => {
                 </Modal>
             </div>
             <footer className={"page-footer"}>
-                <h4 className={"text-center footer-content"}>Interactive Dublin Locations Project</h4>
+                <h3>JOSE HENRIQUE PINTO JOANONI® - 2024/2025</h3>
             </footer>
         </>
     )

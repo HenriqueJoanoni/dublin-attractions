@@ -127,7 +127,20 @@ footer {
   cursor: pointer;
 }
 
+/* OVERRIDING BOOTSTRAP VARIABLES */
+.pagination-custom {
+  --bs-pagination-color: #16325B;
+  --bs-pagination-bg: #fafafa;
+  --bs-pagination-hover-color: #227B94;
+  --bs-pagination-focus-color: #227B94;
+  --bs-pagination-active-color: #fff;
+  --bs-pagination-active-bg: #16325B;
+  --bs-pagination-active-border-color: #16325B;
+}
 
+.active-pagination {
+  cursor: pointer;
+}
 
 /* TABLE STACK CODE: https://stackoverflow.com/questions/28983809/how-to-make-a-table-responsive-stack-columns */
 @media only screen and (max-width: 1080px),
