@@ -26,14 +26,30 @@ const App = () => {
     /** STATE FOR PAGINATION */
     const [postsPerPage] = useState(10)
     const [currentPage, setCurrentPage] = useState(1)
+    const [isMobile, setIsMobile] = useState(false)
+
+    /**********************************************************************************************************
+     *                                  RESIZE CODE CODE BASED ON:                                            *
+     * - https://medium.com/@christian_maehler/handle-window-resizing-with-a-react-context-4392b47285e4       *
+     * - https://medium.com/@bomber.marek/how-to-check-for-window-resizing-in-react-6b57d0ed7776              *
+     *                                                                                                        *
+     **********************************************************************************************************/
 
     /** EFFECT TO FETCH AND SET THE DATA FROM JSON TO THE TABLE */
     useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 1080)
+        }
+        window.addEventListener('resize', handleResize)
+        handleResize()
+
         fetch('dublin_attractions.json')
             .then(res => res.json())
             .then(data => {
                 setLocations(data)
             })
+
+        return () => window.removeEventListener('resize', handleResize)
     }, [])
 
     /** HANDLE SEARCH QUERY */
@@ -124,7 +140,7 @@ const App = () => {
     const indexOfFirstPost = indexOfLastPost - postsPerPage
 
     /** SELECT THE CURRENT ATTRACTIONS */
-    const currentPosts = filteredLocations.slice(indexOfFirstPost, indexOfLastPost)
+    const currentPosts = isMobile ? filteredLocations : filteredLocations.slice(indexOfFirstPost, indexOfLastPost)
 
     /** GENERATE PAGINATION NUMBERS */
     const handlePagination = (length) => {
@@ -256,15 +272,22 @@ const App = () => {
                                 ))}
                                 </tbody>
                             </Table>
-                            <Pagination className={"pagination-custom"}>
-                                {paginationNumbers.map(number => (
-                                    <Pagination.Item key={number} active={number === currentPage}
-                                                     onClick={() => setCurrentPage(number)}
-                                                     className={number === currentPage ? "active-pagination" : ""}>
-                                        {number}
-                                    </Pagination.Item>
-                                ))}
-                            </Pagination>
+                            {!isMobile && (
+                                <div className="pagination-container">
+                                    <Pagination className={"pagination-custom"}>
+                                        {paginationNumbers.map(number => (
+                                            <Pagination.Item
+                                                key={number}
+                                                active={number === currentPage}
+                                                onClick={() => setCurrentPage(number)}
+                                                className={number === currentPage ? 'active-pagination-item' : ''}
+                                            >
+                                                {number}
+                                            </Pagination.Item>
+                                        ))}
+                                    </Pagination>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
