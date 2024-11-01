@@ -12,10 +12,14 @@ const App = () => {
     /** STATE FOR SORTING */
     const [sortConfig, setSortConfig] = useState({key: null, direction: 'asc'})
 
-    /** STATE FOR MODAL */
+    /** STATE FOR MODAL (PICTURES) */
     const [showModal, setShowModal] = useState(false)
     const [selectedPhotos, setSelectedPhotos] = useState([])
     const [currentLocation, setCurrentLocation] = useState("")
+
+    /** STATE FOR MODAL (FORMS) */
+    const [showModalForm, setShowModalForm] = useState(false)
+    const [currentForm, setCurrentForm] = useState("")
 
     /** STATE FOR FILTER BY FREE ATTRACTIONS */
     const [filterByFreeAttractions, setFilterByFreeAttractions] = useState(false)
@@ -99,11 +103,17 @@ const App = () => {
         return sortConfig.direction === 'asc' ? '▲' : '▼'
     }
 
-    /** FUNCTION TO OPEN MODAL */
+    /** FUNCTION TO OPEN MODAL (PICTURES) */
     const handleShowModal = (photos, location) => {
         setSelectedPhotos(photos)
         setCurrentLocation(location)
         setShowModal(true)
+    }
+
+    /** FUNCTION TO OPEN MODAL (FORMS) */
+    const handleShowModalForms = (formType) => {
+        setShowModalForm(true)
+        setCurrentForm(formType)
     }
 
     /** HANDLE FREE ATTRACTIONS FILTER */
@@ -127,6 +137,26 @@ const App = () => {
 
         return matchesSearchQuery && matchesTags && matchesFreeAttractions
     })
+
+    /** HANDLE FORM SUBMIT */
+    const handleFormSubmit = (newAttractionData) => {
+        console.log(newAttractionData)
+        const newAttraction = {
+            id: newAttractionData.attrId,
+            name: newAttractionData.attrName,
+            latitude: newAttractionData.attrLatitude,
+            longitude: newAttractionData.attrLongitude,
+            address: newAttractionData.attrAddress,
+            description: newAttractionData.attrDescription,
+            phoneNumber: newAttractionData.attrPhoneNumber,
+            photosURLs: newAttractionData.attrPhotoURL ? newAttractionData.attrPhotoURL.split(',') : [],
+            tags: newAttractionData.attrTags ? newAttractionData.attrTags.split(',') : [],
+            rating: newAttractionData.attrRating,
+            free: newAttractionData.attrFree
+        }
+
+        setLocations((prevLocations) => [...prevLocations, newAttraction])
+    }
 
     /**********************************************************************************************************
      *                                  BELOW CODE CODE BASED ON:                                             *
@@ -211,6 +241,18 @@ const App = () => {
                             />
                         </Form>
                     </div>
+                    <div className={"col-lg-3 col-md-6 col-sm-12 d-flex align-items-center"}>
+                        {/* INSERT BUTTON */}
+                        <button className={"insert-button"}
+                                onClick={() => handleShowModalForms("insert new attraction")}>Insert new
+                        </button>
+                        {/* UPDATE BUTTON */}
+                        <button className={"update-button crud-buttons"}
+                                onClick={() => handleShowModalForms("update attraction")}>Update Attraction
+                        </button>
+                        {/* DELETE BUTTON */}
+                        <button className={"delete-button crud-buttons"}>Delete Attraction</button>
+                    </div>
                 </div>
             </div>
 
@@ -292,7 +334,7 @@ const App = () => {
                     )}
                 </div>
 
-                {/* MODAL */}
+                {/* MODAL PICTURES */}
                 <Modal show={showModal} onHide={() => setShowModal(false)} size={"lg"} centered>
                     <Modal.Header closeButton>
                         <Modal.Title className={"modal-title"}>{currentLocation}</Modal.Title>
@@ -311,11 +353,191 @@ const App = () => {
                         <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
                     </Modal.Footer>
                 </Modal>
+
+                {/* MODAL FORMS */}
+                <Modal show={showModalForm} onHide={() => setShowModalForm(false)} size={"xl"} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className={"modal-title"}>{currentForm}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {currentForm.toLowerCase().includes('insert') ?
+                            <InsertForm onSubmit={handleFormSubmit}/> :
+                            <UpdateForm/>
+                        }
+                    </Modal.Body>
+                </Modal>
             </div>
             <footer className={"page-footer"}>
                 <h3>JOSE HENRIQUE PINTO JOANONI® - 2024/2025</h3>
             </footer>
         </>
+    )
+}
+
+const InsertForm = ({ onSubmit }) => {
+    const [formData, setFormData] = useState({
+        attrId: "",
+        attrName: "",
+        attrLatitude: "",
+        attrLongitude: "",
+        attrAddress: "",
+        attrDescription: "",
+        attrPhoneNumber: "",
+        attrPhotoURL: "",
+        attrTags: "",
+        attrRating: 0,
+        attrFree: false
+    })
+
+    /* HANDLE FORM CHANGE */
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: type === "checkbox" ? checked : value
+        }))
+    }
+
+    const handleRatingChange = (rating) => {
+        setFormData(prevData => ({
+            ...prevData,
+            attrRating: rating,
+        }))
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        onSubmit(formData)
+    }
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <label htmlFor="attrId">Attraction ID</label>
+            <input
+                className="form-field w-40"
+                type="text"
+                name="attrId"
+                value={formData.attrId}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrName">Attraction Name</label>
+            <input
+                className="form-field w-60"
+                type="text"
+                name="attrName"
+                value={formData.attrName}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrLatitude">Latitude</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrLatitude"
+                value={formData.attrLatitude}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrLongitude">Longitude</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrLongitude"
+                value={formData.attrLongitude}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrAddress">Address</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrAddress"
+                value={formData.attrAddress}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrDescription">Description</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrDescription"
+                value={formData.attrDescription}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrPhoneNumber">Phone Number</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrPhoneNumber"
+                value={formData.attrPhoneNumber}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrPhotoURL">Photos</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrPhotoURL"
+                value={formData.attrPhotoURL}
+                onChange={handleChange}
+            />
+
+            <label htmlFor="attrTags">Tags</label>
+            <input
+                className="form-field w-100"
+                type="text"
+                name="attrTags"
+                value={formData.attrTags}
+                onChange={handleChange}
+            />
+
+            {/*TODO: FIX CSS OF THESE CHECKBOXES*/}
+            <div className="form-checkbox">
+                <label>Rating</label>
+                {[1, 2, 3, 4, 5].map((num) => (
+                    <label key={num} className="form-check-label">
+                        <input
+                            className="form-checkbox-input"
+                            type="checkbox"
+                            checked={formData.attrRating === num}
+                            onChange={() => handleRatingChange(num)}
+                        />
+                        {num}
+                    </label>
+                ))}
+            </div>
+
+            {/*FIX: WHEN CHECKED, ATTRACTION DOESN'T SHOW UP AS FREE*/}
+            <div className="form-checkbox">
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="attrFree"
+                    checked={formData.attrFree}
+                    onChange={handleChange}
+                />
+                <label className="form-checkbox-label" htmlFor="attrFree">
+                    Is this a free attraction?
+                </label>
+            </div>
+
+            <Modal.Footer>
+                <Button variant="primary" type="submit">Insert</Button>
+            </Modal.Footer>
+        </form>
+    )
+}
+
+const UpdateForm = () => {
+    return (
+        <form>
+            <label htmlFor="fname">First name:</label><br/>
+            <input type="text" id="fname" name="fname"/><br/>
+            <label htmlFor="lname">Last name:</label><br/>
+            <input type="text" id="lname" name="lname"/>
+        </form>
     )
 }
 

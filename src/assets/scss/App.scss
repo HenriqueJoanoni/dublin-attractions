@@ -39,7 +39,8 @@
   margin-left: auto;
 }
 
-.search-field {
+.search-field,
+.form-field {
   display: block;
   flex: 0 0 auto;
   width: 25%;
@@ -47,7 +48,7 @@
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #212529;
+  color: $default-font-color;
   appearance: none;
   background-color: #FFF;
   background-clip: padding-box;
@@ -79,7 +80,7 @@ footer {
   background-color: $quaternary-color;
   width: auto;
   height: 5em;
-  color: #212529;
+  color: $default-font-color;
   font-size: 12px;
   text-align: center;
   padding: 1em;
@@ -146,6 +147,77 @@ footer {
 
 .active-pagination {
   cursor: pointer;
+}
+
+.crud-buttons {
+  margin-left: 5px;
+}
+
+.insert-button {
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: $secondary-color;
+  color: $background;
+  border: none;
+}
+
+.insert-button:hover {
+  background-color: $tertiary-color;
+  color: $background;
+  text-shadow: 1px 1px 2px #1a1d20;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: .5s;
+}
+
+.update-button {
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: $quaternary-color;
+  border: none;
+}
+
+.update-button:hover {
+  background-color: $update-button-hover-color;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: .5s;
+}
+
+.delete-button {
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: $delete-button-color;
+  color: $background;
+  border: none;
+}
+
+.delete-button:hover {
+  background-color: $delete-button-hover-color;
+  color: $background;
+  text-shadow: 1px 1px 2px #1a1d20;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.3);
+  transition: .5s;
+}
+
+.form-checkbox {
+  display: block;
+  min-height: 1.5rem;
+  margin-bottom: 0.125rem;
+  margin-top: 0.5rem;
+}
+
+.form-checkbox-input {
+  float: left;
+  margin-left: 1.5em;
+  border-radius: 0.25em;
+}
+
+.form-checkbox-label {
+  cursor: default;
+  color: $default-font-color;
+  margin-left: 0.5em;
 }
 
 /* TABLE STACK CODE: https://stackoverflow.com/questions/28983809/how-to-make-a-table-responsive-stack-columns */
