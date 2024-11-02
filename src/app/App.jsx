@@ -172,7 +172,6 @@ const App = () => {
 
     /** HANDLE DELETE ATTRACTION */
     const handleDeleteElement = (attractionID) => {
-        console.log(attractionID)
         setDeleteAttraction((prevAttractions) =>
             prevAttractions.filter((attraction) => attraction.id !== attractionID)
         )
