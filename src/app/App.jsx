@@ -149,7 +149,7 @@ const App = () => {
             address: newAttractionData.attrAddress,
             description: newAttractionData.attrDescription,
             phoneNumber: newAttractionData.attrPhoneNumber,
-            photosURLs: newAttractionData.attrPhotoURL ? newAttractionData.attrPhotoURL.split(',') : [],
+            photosURLs: newAttractionData.attrPhotos ? Array.from(newAttractionData.attrPhotos).map(file => URL.createObjectURL(file)) : [],
             tags: newAttractionData.attrTags ? newAttractionData.attrTags.split(',') : [],
             rating: newAttractionData.attrRating,
             free: newAttractionData.attrFree
@@ -250,8 +250,6 @@ const App = () => {
                         <button className={"update-button crud-buttons"}
                                 onClick={() => handleShowModalForms("update attraction")}>Update Attraction
                         </button>
-                        {/* DELETE BUTTON */}
-                        <button className={"delete-button crud-buttons"}>Delete Attraction</button>
                     </div>
                 </div>
             </div>
@@ -281,6 +279,7 @@ const App = () => {
                                     <th className={"sort-row"}
                                         onClick={() => handleSort('rating')}>Rating {getSortIcon('rating')}</th>
                                     <th>Free</th>
+                                    <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -310,6 +309,17 @@ const App = () => {
                                         </td>
                                         <td data-title="rating">{item.rating}</td>
                                         <td data-title="description">{searchFreeAttractions(item.description) ? 'Free' : "No"}</td>
+                                        <td data-title="delete-item">
+                                            <button className={"delete-button crud-buttons"}>
+                                                <img
+                                                    src="/src/assets/img/recycle-bin.png"
+                                                    width={"20"}
+                                                    height={"20"}
+                                                    alt="trash icon"
+                                                    title="Delete Element"
+                                                />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -383,15 +393,15 @@ const InsertForm = ({ onSubmit }) => {
         attrAddress: "",
         attrDescription: "",
         attrPhoneNumber: "",
-        attrPhotoURL: "",
+        attrPhotoURL: [],
         attrTags: "",
         attrRating: 0,
         attrFree: false
     })
 
     /* HANDLE FORM CHANGE */
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target
+    const handleChange = (ev) => {
+        const { name, value, type, checked } = ev.target
         setFormData((prevData) => ({
             ...prevData,
             [name]: type === "checkbox" ? checked : value
@@ -405,122 +415,162 @@ const InsertForm = ({ onSubmit }) => {
         }))
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
+    const handleUploadImage = (img) => {
+        setFormData(prevData => ({
+            ...prevData,
+            attrPhotoURL: img.target.files
+        }))
+    }
+
+    const handleSubmit = (ev) => {
+        ev.preventDefault()
         onSubmit(formData)
     }
 
     return (
         <form onSubmit={handleSubmit}>
-            <label htmlFor="attrId">Attraction ID</label>
-            <input
-                className="form-field w-40"
-                type="text"
-                name="attrId"
-                value={formData.attrId}
-                onChange={handleChange}
-            />
+            <div className="row">
+                <div className="col">
+                    <label htmlFor="attrId">Attraction ID</label>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="attrId"
+                        value={formData.attrId}
+                        onChange={handleChange}
+                    />
+                </div>
 
-            <label htmlFor="attrName">Attraction Name</label>
-            <input
-                className="form-field w-60"
-                type="text"
-                name="attrName"
-                value={formData.attrName}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrLatitude">Latitude</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrLatitude"
-                value={formData.attrLatitude}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrLongitude">Longitude</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrLongitude"
-                value={formData.attrLongitude}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrAddress">Address</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrAddress"
-                value={formData.attrAddress}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrDescription">Description</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrDescription"
-                value={formData.attrDescription}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrPhoneNumber">Phone Number</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrPhoneNumber"
-                value={formData.attrPhoneNumber}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrPhotoURL">Photos</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrPhotoURL"
-                value={formData.attrPhotoURL}
-                onChange={handleChange}
-            />
-
-            <label htmlFor="attrTags">Tags</label>
-            <input
-                className="form-field w-100"
-                type="text"
-                name="attrTags"
-                value={formData.attrTags}
-                onChange={handleChange}
-            />
-
-            {/*TODO: FIX CSS OF THESE CHECKBOXES*/}
-            <div className="form-checkbox">
-                <label>Rating</label>
-                {[1, 2, 3, 4, 5].map((num) => (
-                    <label key={num} className="form-check-label">
-                        <input
-                            className="form-checkbox-input"
-                            type="checkbox"
-                            checked={formData.attrRating === num}
-                            onChange={() => handleRatingChange(num)}
-                        />
-                        {num}
-                    </label>
-                ))}
+                <div className="col">
+                    <label htmlFor="attrName">Attraction Name</label>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="attrName"
+                        value={formData.attrName}
+                        onChange={handleChange}
+                    />
+                </div>
             </div>
 
-            {/*FIX: WHEN CHECKED, ATTRACTION DOESN'T SHOW UP AS FREE*/}
-            <div className="form-checkbox">
+            <div className="row mt-2">
+                <div className="col">
+                    <label htmlFor="attrLatitude">Latitude</label>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="attrLatitude"
+                        value={formData.attrLatitude}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col">
+                    <label htmlFor="attrLongitude">Longitude</label>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="attrLongitude"
+                        value={formData.attrLongitude}
+                        onChange={handleChange}
+                    />
+                </div>
+            </div>
+
+            <div className="mt-2">
+                <label htmlFor="attrAddress">Address</label>
                 <input
-                    className="form-check-input"
-                    type="checkbox"
-                    name="attrFree"
-                    checked={formData.attrFree}
+                    className="form-field w-100"
+                    type="text"
+                    name="attrAddress"
+                    value={formData.attrAddress}
                     onChange={handleChange}
                 />
-                <label className="form-checkbox-label" htmlFor="attrFree">
-                    Is this a free attraction?
-                </label>
+            </div>
+
+            <div className="mt-2">
+                <label htmlFor="attrDescription">Description</label>
+                <textarea
+                    className="form-control"
+                    name="attrDescription"
+                    cols="30"
+                    rows="5"
+                    value={formData.attrDescription}
+                    onChange={handleChange}>
+            </textarea>
+            </div>
+
+            <div className="mt-2">
+                <label htmlFor="attrPhoneNumber">Phone Number</label>
+                <input
+                    className="form-field w-100"
+                    type="text"
+                    name="attrPhoneNumber"
+                    value={formData.attrPhoneNumber}
+                    onChange={handleChange}
+                />
+            </div>
+
+            {/**********************************************************************************************************
+             *                                  BELOW CODE CODE BASED ON:                                               *
+             * - https://cloudinary.com/blog/how-to-upload-multiple-images-at-once-in-react                             *
+            *                                                                                                          *
+            **********************************************************************************************************/}
+
+            <div className="row mt-2">
+                <div className="col">
+                    <label htmlFor="attrPhotoURL">Photos</label>
+                    <input
+                        className="form-control"
+                        type="file"
+                        name="attrPhotoURL"
+                        multiple
+                        onChange={handleUploadImage}
+                    />
+                </div>
+
+                <div className="col">
+                    <label htmlFor="attrTags">Tags</label>
+                    <input
+                        className="form-control"
+                        type="text"
+                        name="attrTags"
+                        value={formData.attrTags}
+                        onChange={handleChange}
+                    />
+                </div>
+            </div>
+
+            <div className="mt-2">
+                <div className="form-group">
+                    <label>Rating</label>
+                    <div>
+                        {[1, 2, 3, 4, 5].map((num) => (
+                            <label key={num} className="form-check form-check-inline">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={formData.attrRating === num}
+                                    onChange={() => handleRatingChange(num)}
+                                />
+                                {num}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label className="form-check-label" htmlFor="attrFree">
+                        Free attraction?
+                    </label>
+                    <input
+                        className="form-check-input ms-2"
+                        type="checkbox"
+                        name="attrFree"
+                        checked={formData.attrFree}
+                        onChange={handleChange}
+                    />
+                </div>
             </div>
 
             <Modal.Footer>
