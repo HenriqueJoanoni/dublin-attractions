@@ -3,6 +3,34 @@ import { useEffect, useState } from "react"
 import { Button, Carousel, Container, Form, Modal, Navbar, Spinner, Table, Pagination } from "react-bootstrap"
 
 const App = () => {
+    /**********************************************************************************************************
+     *                                  RESIZE CODE CODE BASED ON:                                            *
+     * - https://medium.com/@christian_maehler/handle-window-resizing-with-a-react-context-4392b47285e4       *
+     * - https://medium.com/@bomber.marek/how-to-check-for-window-resizing-in-react-6b57d0ed7776              *
+     *                                                                                                        *
+     **********************************************************************************************************/
+
+    /** EFFECT TO FETCH AND SET THE DATA FROM JSON TO THE TABLE */
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 1080)
+        }
+        window.addEventListener('resize', handleResize)
+        handleResize()
+
+        fetch('dublin_attractions.json')
+            .then(res => res.json())
+            .then(data => {
+                setLocations(data)
+            })
+
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
+    /**********************************************************************************************************
+     *                                  INITIAL STATES                                                        *
+     **********************************************************************************************************/
+
     /** STATE FOR PARSING THE JSON FILE THE FIRST TIME */
     const [locations, setLocations] = useState([])
 
@@ -27,34 +55,17 @@ const App = () => {
     /** STATE FOR FILTER BY TAGS */
     const [filterByTags, setFilterByTags] = useState("")
 
+    /** STATE FOR DELETE BUTTON */
+    const [deleteAttraction, setDeleteAttraction] = useState([])
+
     /** STATE FOR PAGINATION */
     const [postsPerPage] = useState(10)
     const [currentPage, setCurrentPage] = useState(1)
     const [isMobile, setIsMobile] = useState(false)
 
     /**********************************************************************************************************
-     *                                  RESIZE CODE CODE BASED ON:                                            *
-     * - https://medium.com/@christian_maehler/handle-window-resizing-with-a-react-context-4392b47285e4       *
-     * - https://medium.com/@bomber.marek/how-to-check-for-window-resizing-in-react-6b57d0ed7776              *
-     *                                                                                                        *
+     *                                      HANDLERS                                                          *
      **********************************************************************************************************/
-
-    /** EFFECT TO FETCH AND SET THE DATA FROM JSON TO THE TABLE */
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth <= 1080)
-        }
-        window.addEventListener('resize', handleResize)
-        handleResize()
-
-        fetch('dublin_attractions.json')
-            .then(res => res.json())
-            .then(data => {
-                setLocations(data)
-            })
-
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
 
     /** HANDLE SEARCH QUERY */
     const handleSearchChange = (query) => {
@@ -156,6 +167,18 @@ const App = () => {
         }
 
         setLocations((prevLocations) => [...prevLocations, newAttraction])
+        setDeleteAttraction((allLocations) => [...allLocations, newAttraction])
+    }
+
+    /** HANDLE DELETE ATTRACTION */
+    const handleDeleteElement = (attractionID) => {
+        console.log(attractionID)
+        setDeleteAttraction((prevAttractions) =>
+            prevAttractions.filter((attraction) => attraction.id !== attractionID)
+        )
+        setLocations((prevLocations) =>
+            prevLocations.filter((location) => location.id !== attractionID)
+        )
     }
 
     /**********************************************************************************************************
@@ -310,11 +333,14 @@ const App = () => {
                                         <td data-title="rating">{item.rating}</td>
                                         <td data-title="description">{searchFreeAttractions(item.description) ? 'Free' : "No"}</td>
                                         <td data-title="delete-item">
-                                            <button className={"delete-button crud-buttons"}>
+                                            <button
+                                                className="delete-button crud-buttons"
+                                                onClick={() => handleDeleteElement(item.id)}
+                                            >
                                                 <img
                                                     src="/src/assets/img/recycle-bin.png"
-                                                    width={"20"}
-                                                    height={"20"}
+                                                    width="20"
+                                                    height="20"
                                                     alt="trash icon"
                                                     title="Delete Element"
                                                 />
@@ -384,7 +410,8 @@ const App = () => {
     )
 }
 
-const InsertForm = ({ onSubmit }) => {
+/* INSERT FORM */
+const InsertForm = ({onSubmit}) => {
     const [formData, setFormData] = useState({
         attrId: "",
         attrName: "",
@@ -580,6 +607,7 @@ const InsertForm = ({ onSubmit }) => {
     )
 }
 
+/* UPDATE FORM */
 const UpdateForm = () => {
     return (
         <form>
