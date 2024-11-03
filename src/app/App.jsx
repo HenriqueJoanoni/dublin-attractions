@@ -49,6 +49,11 @@ const App = () => {
     const [showModalForm, setShowModalForm] = useState(false)
     const [currentForm, setCurrentForm] = useState("")
 
+    /** STATE FOR MODAL (DELETE) */
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [deleteAttractionID, setDeleteAttractionID] = useState("")
+    const [deleteAttractionName, setDeleteAttractionName] = useState("")
+
     /** STATE FOR FILTER BY FREE ATTRACTIONS */
     const [filterByFreeAttractions, setFilterByFreeAttractions] = useState(false)
 
@@ -133,6 +138,13 @@ const App = () => {
         setCurrentForm(formType)
     }
 
+    /** FUNCTION TO OPEN DELETE MODAL */
+    const handleShowDeleteModal = (attractionID, attractionName) => {
+        setShowDeleteModal(true)
+        setDeleteAttractionID(attractionID)
+        setDeleteAttractionName(attractionName)
+    }
+
     /** HANDLE FREE ATTRACTIONS FILTER */
     const handleFreeAttractions = () => {
         setFilterByFreeAttractions(!filterByFreeAttractions)
@@ -210,6 +222,7 @@ const App = () => {
         setLocations((prevLocations) =>
             prevLocations.filter((location) => location.id !== attractionID)
         )
+        setShowDeleteModal(false)
     }
 
     /**********************************************************************************************************
@@ -392,7 +405,7 @@ const App = () => {
                                                 </button>
                                                 <button
                                                     className="delete-button crud-buttons"
-                                                    onClick={() => handleDeleteElement(item.id)}
+                                                    onClick={() => handleShowDeleteModal(item.id, item.name)}
                                                 >
                                                     <img
                                                         src="/src/assets/img/recycle-bin.png"
@@ -459,6 +472,20 @@ const App = () => {
                             <UpdateForm updatedAttraction={updatedAttraction} onSubmit={handleFormSubmit}/>
                         }
                     </Modal.Body>
+                </Modal>
+
+                {/* MODAL DELETE */}
+                <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} size={"lg"} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title className={"modal-title"}>{deleteAttractionName}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <h3>Are you sure you want to delete <b>{deleteAttractionName}</b> ?</h3>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={() => handleDeleteElement(deleteAttractionID)}>Yes, delete</Button>
+                        <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>No</Button>
+                    </Modal.Footer>
                 </Modal>
             </div>
             <footer className={"page-footer"}>
