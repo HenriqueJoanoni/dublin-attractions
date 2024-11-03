@@ -60,6 +60,9 @@ const App = () => {
 
     /** STATE FOR UPDATE BUTTON */
     const [updatedAttraction, setUpdatedAttraction] = useState([])
+    
+    /** STATE FOR FILTER BY RATING */
+    const [filterByRating, setFilterByRating] = useState(false)
 
     /** STATE FOR PAGINATION */
     const [postsPerPage] = useState(10)
@@ -135,6 +138,11 @@ const App = () => {
         setFilterByFreeAttractions(!filterByFreeAttractions)
     }
 
+    /** HANDLE RATING FILTER */
+    const handleRatingAttractions = () => {
+        setFilterByRating(!filterByRating)
+    }
+
     /** FILTER LOCATIONS BASED ON SEARCH QUERY AND FREE ATTRACTIONS */
     const filteredLocations = sortedLocations.filter(location => {
         const matchesSearchQuery =
@@ -149,7 +157,9 @@ const App = () => {
             ? searchFreeAttractions(location.description)
             : true
 
-        return matchesSearchQuery && matchesTags && matchesFreeAttractions
+        const matchesRating = filterByRating ? location.rating > 4.5 : true
+
+        return matchesSearchQuery && matchesTags && matchesFreeAttractions && matchesRating
     })
 
     /** HANDLE FORM SUBMIT */
@@ -282,6 +292,18 @@ const App = () => {
                                 label="Free activities only"
                                 onChange={handleFreeAttractions}
                                 checked={filterByFreeAttractions}
+                            />
+                        </Form>
+
+                        {/* FILTER BY RATING */}
+                        <Form className={"w-100"}>
+                            <Form.Check
+                                className={"mt-2"}
+                                type="switch"
+                                id="custom-switch"
+                                label="5 star attractions"
+                                onChange={handleRatingAttractions}
+                                checked={filterByRating}
                             />
                         </Form>
                     </div>
