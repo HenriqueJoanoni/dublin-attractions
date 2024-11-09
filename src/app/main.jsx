@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom/client'
-// import App from './App.jsx'
 import '../assets/scss/App.scss'
 import { Navbar, Container, Form, Button, Table, Spinner, Pagination, Modal, Carousel } from 'react-bootstrap';
 
@@ -15,7 +14,7 @@ class App extends React.Component {
             showModal: false,
             selectedPhotos: [],
             currentLocation: '',
-            showModalForm: false,
+            showModalInsertForm: false,
             currentForm: '',
             showDeleteModal: false,
             deleteAttractionID: '',
@@ -35,12 +34,12 @@ class App extends React.Component {
         this.handleTagsSearch = this.handleTagsSearch.bind(this);
         this.handleSort = this.handleSort.bind(this);
         this.handleShowModal = this.handleShowModal.bind(this);
-        this.handleShowModalForms = this.handleShowModalForms.bind(this);
         this.handleShowDeleteModal = this.handleShowDeleteModal.bind(this);
         this.handleFreeAttractions = this.handleFreeAttractions.bind(this);
         this.handleRatingAttractions = this.handleRatingAttractions.bind(this);
         this.handleFormSubmit = this.handleFormSubmit.bind(this);
         this.handleDeleteElement = this.handleDeleteElement.bind(this);
+        this.closeModalInsertForm = this.closeModalInsertForm.bind(this)
     }
 
     componentDidMount() {
@@ -77,23 +76,24 @@ class App extends React.Component {
         this.setState({selectedPhotos: photos, currentLocation: location, showModal: true});
     }
 
-    handleShowModalForms(formType) {
-        this.setState({showModalForm: true, currentForm: formType});
-    }
-
     handleShowDeleteModal(attractionID, attractionName) {
         this.setState({showDeleteModal: true, deleteAttractionID: attractionID, deleteAttractionName: attractionName});
     }
 
-    handleFreeAttractions() {
-        this.setState(prevState => ({filterByFreeAttractions: !prevState.filterByFreeAttractions}));
+    handleFreeAttractions = (checked) => {
+        this.setState({filterByFreeAttractions: checked});
     }
 
-    handleRatingAttractions() {
-        this.setState(prevState => ({filterByRating: !prevState.filterByRating}));
+    handleRatingAttractions = (checked) => {
+        this.setState({filterByRating: checked});
+    }
+
+    closeModalInsertForm() {
+        this.setState({showModalInsertForm: false})
     }
 
     handleFormSubmit(newAttractionData) {
+        console.log(newAttractionData)
         const newAttraction = {
             id: newAttractionData.attrId,
             name: newAttractionData.attrName,
@@ -194,63 +194,21 @@ class App extends React.Component {
             <>
                 <NavigationBar/>
 
-                <div className={"space-around"}>
-                    <div className={"row"}>
-                        <div className={"col-lg-3 col-md-6 col-sm-12 mb-3"}>
-                            {/* SEARCH BY NAME AND ADDRESS */}
-                            <form>
-                                <label htmlFor="searchLocation">Search By Name or Address</label>
-                                <input
-                                    className={"search-field box-shadow-custom w-100"}
-                                    type="text"
-                                    placeholder={"Search..."}
-                                    value={searchQuery}
-                                    onChange={e => this.handleSearchChange(e.target.value)}
-                                />
-                            </form>
-                        </div>
-                        <div className={"col-lg-3 col-md-6 col-sm-12 mb-3"}>
-                            {/* SEARCH BY TAGS */}
-                            <form>
-                                <label htmlFor="searchTags">Search By Tags</label>
-                                <input
-                                    className={"search-field box-shadow-custom w-100"}
-                                    type="text"
-                                    placeholder={"Search Tags..."}
-                                    value={filterByTags}
-                                    onChange={e => this.handleTagsSearch(e.target.value)}
-                                />
-                            </form>
-                        </div>
-                        <div className={"col-lg-3 col-md-6 col-sm-12 d-flex align-items-center"}>
-                            {/* FILTER BY FREE ATTRACTIONS */}
-                            <Form className={"w-100"}>
-                                <Form.Check
-                                    className={"mt-2"}
-                                    type="switch"
-                                    id="custom-switch"
-                                    label="Free activities only"
-                                    onChange={this.handleFreeAttractions}
-                                    checked={filterByFreeAttractions}
-                                />
-                            </Form>
+                <div className="space-around">
+                    <div className="row">
+                        <SearchFilterSort
+                            onSearch={this.handleSearchChange}
+                            onTagSearch={this.handleSearchChange}
+                            onFreeAttractions={this.handleFreeAttractions}
+                            onRatingAttractions={this.handleRatingAttractions}
+                        />
 
-                            {/* FILTER BY RATING */}
-                            <Form className={"w-100"}>
-                                <Form.Check
-                                    className={"mt-2"}
-                                    type="switch"
-                                    id="custom-switch"
-                                    label="5 star attractions"
-                                    onChange={this.handleRatingAttractions}
-                                    checked={filterByRating}
-                                />
-                            </Form>
-                        </div>
-                        <div className={"col-lg-3 col-md-6 col-sm-12 d-flex align-items-center"}>
-                            {/* INSERT BUTTON */}
-                            <button className={"insert-button"}
-                                    onClick={() => this.handleShowModalForms("insert new attraction")}>Insert new
+                        <div className="col-lg-3 col-md-6 col-sm-12 d-flex align-items-center">
+                            <button
+                                className="insert-button"
+                                onClick={() => this.setState({showModalInsertForm: true})}
+                            >
+                                Insert new
                             </button>
                         </div>
                     </div>
@@ -316,7 +274,7 @@ class App extends React.Component {
                                             </td>
                                             <td data-title="action-buttons">
                                                 <div className="button-group">
-                                                    <ShowModalUpdateForm/>
+                                                    {/*<ShowModalUpdateForm/>*/}
                                                     <DeleteModal
                                                         attractionID={item.id}
                                                         attractionName={item.name}
@@ -351,17 +309,11 @@ class App extends React.Component {
                     />
 
                     {/* MODAL FORMS */}
-                    {/*<Modal show={this.showModalForm} onHide={() => setShowModalForm(false)} size={"xl"} centered>*/}
-                    {/*    <Modal.Header closeButton>*/}
-                    {/*        <Modal.Title className={"modal-title"}>{currentForm}</Modal.Title>*/}
-                    {/*    </Modal.Header>*/}
-                    {/*    <Modal.Body>*/}
-                    {/*        {currentForm.toLowerCase().includes('insert') ?*/}
-                    {/*            <InsertForm onSubmit={this.handleFormSubmit}/> :*/}
-                    {/*            <UpdateForm updatedAttraction={this.updatedAttraction} onSubmit={this.handleFormSubmit}/>*/}
-                    {/*        }*/}
-                    {/*    </Modal.Body>*/}
-                    {/*</Modal>*/}
+                    <InsertForm
+                        handleFormSubmit={this.handleFormSubmit}
+                        showModal={this.state.showModalInsertForm}
+                        closeModal={this.closeModalInsertForm}
+                    />
                 </div>
                 <PageFooter/>
             </>
@@ -528,41 +480,326 @@ class PageFooter extends React.Component {
     }
 }
 
-class ShowModalUpdateForm extends React.Component {
+class SearchFilterSort extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
-            updatedAttraction: null,
-            showModal: false,
-        }
+            searchQuery: '',
+            filterByTags: '',
+            filterByFreeAttractions: false,
+            filterByRating: false,
+        };
     }
 
-    setUpdatedAttraction = (item) => {
-        this.setState({updatedAttraction: item})
+    handleSearchChange = (query) => {
+        this.setState({searchQuery: query});
+        this.props.onSearch(query);
     }
 
-    handleShowModalForms = (type) => {
-        this.setState({showModal: true, modalType: type})
+    handleTagsSearch = (query) => {
+        this.setState({filterByTags: query});
+        this.props.onTagSearch(query);
+    }
+
+    handleFreeAttractions = () => {
+        this.setState(prevState => {
+            const newState = {filterByFreeAttractions: !prevState.filterByFreeAttractions};
+            this.props.onFreeAttractions(newState.filterByFreeAttractions);
+            return newState;
+        });
+    }
+
+    handleRatingAttractions = () => {
+        this.setState(prevState => {
+            const newState = {filterByRating: !prevState.filterByRating};
+            this.props.onRatingAttractions(newState.filterByRating);
+            return newState;
+        });
+    }
+
+    render() {
+        const {searchQuery, filterByTags, filterByFreeAttractions, filterByRating} = this.state;
+
+        return (
+            <>
+                <div className="col-lg-3 col-md-6 col-sm-12 mb-3">
+                    {/* SEARCH BY NAME AND ADDRESS */}
+                    <form>
+                        <label htmlFor="searchLocation">Search By Name or Address</label>
+                        <input
+                            className="search-field box-shadow-custom w-100"
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={e => this.handleSearchChange(e.target.value)}
+                        />
+                    </form>
+                </div>
+                <div className="col-lg-3 col-md-6 col-sm-12 mb-3">
+                    {/* SEARCH BY TAGS */}
+                    <form>
+                        <label htmlFor="searchTags">Search By Tags</label>
+                        <input
+                            className="search-field box-shadow-custom w-100"
+                            type="text"
+                            placeholder="Search Tags..."
+                            value={filterByTags}
+                            onChange={e => this.handleTagsSearch(e.target.value)}
+                        />
+                    </form>
+                </div>
+                <div className="col-lg-3 col-md-6 col-sm-12 d-flex align-items-center">
+                    {/* FILTER BY FREE ATTRACTIONS */}
+                    <Form className="w-100">
+                        <Form.Check
+                            className="mt-2"
+                            type="switch"
+                            id="custom-switch"
+                            label="Free activities only"
+                            onChange={this.handleFreeAttractions}
+                            checked={filterByFreeAttractions}
+                        />
+                    </Form>
+
+                    {/* FILTER BY RATING */}
+                    <Form className="w-100">
+                        <Form.Check
+                            className="mt-2"
+                            type="switch"
+                            id="custom-switch"
+                            label="5 star attractions"
+                            onChange={this.handleRatingAttractions}
+                            checked={filterByRating}
+                        />
+                    </Form>
+                </div>
+            </>
+        );
+    }
+}
+
+class InsertForm extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            formData: {
+                attrId: '',
+                attrName: '',
+                attrLatitude: '',
+                attrLongitude: '',
+                attrAddress: '',
+                attrDescription: '',
+                attrPhoneNumber: '',
+                attrPhotos: [],
+                attrTags: '',
+                attrRating: 1,
+                attrFree: false
+            },
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleUploadImage = this.handleUploadImage.bind(this)
+    }
+
+    handleChange(event) {
+        const {name, value, type, checked} = event.target;
+        this.setState(prevState => ({
+            formData: {
+                ...prevState.formData,
+                [name]: type === 'checkbox' ? checked : value,
+            }
+        }));
+    }
+
+    handleRatingChange(rating) {
+        this.setState(prevData => ({
+            formData: {
+                ...prevData.formData,
+                attrRating: rating,
+            }
+        }));
+    }
+
+    handleUploadImage(event) {
+        const files = event.target.files;
+        const fileArray = Array.from(files);
+        this.setState(prevState => ({
+            formData: {
+                ...prevState.formData,
+                attrPhotos: [...prevState.formData.attrPhotos, ...fileArray]
+            }
+        }));
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        this.props.handleFormSubmit(this.state.formData);
+        this.props.closeModal()
     }
 
     render() {
         return (
-            <button
-                className="update-button crud-buttons"
-                onClick={() => {
-                    this.handleShowModalForms("update attraction")
-                    this.setUpdatedAttraction(item)
-                }}
-            >
-                <img
-                    src="/src/assets/img/pencil.png"
-                    width="20"
-                    height="20"
-                    alt="pencil icon"
-                    title="Edit Element"
-                />
-            </button>
-        )
+            <Modal show={this.props.showModal} onHide={this.props.closeModal} size={"xl"} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Insert New Attraction</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="row">
+                            <div className="col">
+                                <label htmlFor="attrId">Attraction ID</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrId"
+                                    value={this.state.formData.attrId}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+
+                            <div className="col">
+                                <label htmlFor="attrName">Attraction Name</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrName"
+                                    value={this.state.formData.attrName}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row mt-2">
+                            <div className="col">
+                                <label htmlFor="attrLatitude">Latitude</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrLatitude"
+                                    value={this.state.formData.attrLatitude}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+
+                            <div className="col">
+                                <label htmlFor="attrLongitude">Longitude</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrLongitude"
+                                    value={this.state.formData.attrLongitude}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mt-2">
+                            <label htmlFor="attrAddress">Address</label>
+                            <input
+                                className="form-field w-100"
+                                type="text"
+                                name="attrAddress"
+                                value={this.state.formData.attrAddress}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+
+                        <div className="mt-2">
+                            <label htmlFor="attrDescription">Description</label>
+                            <textarea
+                                className="form-control"
+                                name="attrDescription"
+                                cols="30"
+                                rows="5"
+                                value={this.state.formData.attrDescription}
+                                onChange={this.handleChange}>
+                            </textarea>
+                        </div>
+
+                        <div className="mt-2">
+                            <label htmlFor="attrPhoneNumber">Phone Number</label>
+                            <input
+                                className="form-field w-100"
+                                type="text"
+                                name="attrPhoneNumber"
+                                value={this.state.formData.attrPhoneNumber}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+
+                        {/**********************************************************************************************************
+                         *                                  BELOW CODE CODE BASED ON:                                               *
+                         * - https://cloudinary.com/blog/how-to-upload-multiple-images-at-once-in-react                             *
+                         *                                                                                                          *
+                         **********************************************************************************************************/}
+
+                        <div className="row mt-2">
+                            <div className="col">
+                                <label htmlFor="attrPhotoURL">Photos</label>
+                                <input
+                                    className="form-control"
+                                    type="file"
+                                    name="attrPhotoURL"
+                                    multiple
+                                    onChange={this.handleUploadImage}
+                                />
+                            </div>
+
+                            <div className="col">
+                                <label htmlFor="attrTags">Tags</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrTags"
+                                    value={this.state.formData.attrTags}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mt-2">
+                            <div className="form-group">
+                                <label>Rating</label>
+                                <div>
+                                    {[1, 2, 3, 4, 5].map((num) => (
+                                        <label key={num} className="form-check form-check-inline">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="attrRating"
+                                                checked={this.state.formData.attrRating === num}
+                                                onChange={() => this.handleRatingChange(num)}
+                                            />
+                                            {num}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-check-label" htmlFor="attrFree">
+                                    Free attraction?
+                                </label>
+                                <input
+                                    className="form-check-input ms-2"
+                                    type="checkbox"
+                                    name="attrFree"
+                                    checked={this.state.formData.attrFree}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <Modal.Footer>
+                            <Button variant="primary" type="submit">Insert</Button>
+                        </Modal.Footer>
+                    </form>
+                </Modal.Body>
+            </Modal>
+        );
     }
 }
 
