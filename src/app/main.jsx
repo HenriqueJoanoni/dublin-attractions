@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom/client'
 import '../assets/scss/App.scss'
-import { Navbar, Container, Form, Button, Table, Spinner, Pagination, Modal, Carousel } from 'react-bootstrap';
+import { Navbar, Container, Form, Button, Table, Spinner, Pagination, Modal, Carousel } from 'react-bootstrap'
 
 class App extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             locations: [],
@@ -15,6 +15,8 @@ class App extends React.Component {
             selectedPhotos: [],
             currentLocation: '',
             showModalInsertForm: false,
+            showUpdateModal: false,
+            selectedAttraction: null,
             currentForm: '',
             showDeleteModal: false,
             deleteAttractionID: '',
@@ -27,65 +29,79 @@ class App extends React.Component {
             postsPerPage: 10,
             currentPage: 1,
             isMobile: false,
-        };
+        }
 
-        this.handleResize = this.handleResize.bind(this);
-        this.handleSearchChange = this.handleSearchChange.bind(this);
-        this.handleTagsSearch = this.handleTagsSearch.bind(this);
-        this.handleSort = this.handleSort.bind(this);
-        this.handleShowModal = this.handleShowModal.bind(this);
-        this.handleShowDeleteModal = this.handleShowDeleteModal.bind(this);
-        this.handleFreeAttractions = this.handleFreeAttractions.bind(this);
-        this.handleRatingAttractions = this.handleRatingAttractions.bind(this);
-        this.handleFormSubmit = this.handleFormSubmit.bind(this);
-        this.handleDeleteElement = this.handleDeleteElement.bind(this);
+        this.handleResize = this.handleResize.bind(this)
+        this.handleSearchChange = this.handleSearchChange.bind(this)
+        this.handleTagsSearch = this.handleTagsSearch.bind(this)
+        this.handleSort = this.handleSort.bind(this)
+        this.handleShowModal = this.handleShowModal.bind(this)
+        this.handleShowDeleteModal = this.handleShowDeleteModal.bind(this)
+        this.handleFreeAttractions = this.handleFreeAttractions.bind(this)
+        this.handleRatingAttractions = this.handleRatingAttractions.bind(this)
+        this.handleFormSubmit = this.handleFormSubmit.bind(this)
+        this.handleDeleteElement = this.handleDeleteElement.bind(this)
         this.closeModalInsertForm = this.closeModalInsertForm.bind(this)
     }
 
+    /**********************************************************************************************************
+     *                                  RESIZE CODE CODE BASED ON:                                            *
+     * - https://medium.com/@christian_maehler/handle-window-resizing-with-a-react-context-4392b47285e4       *
+     * - https://medium.com/@bomber.marek/how-to-check-for-window-resizing-in-react-6b57d0ed7776              *
+     *                                                                                                        *
+     **********************************************************************************************************/
+
     componentDidMount() {
-        window.addEventListener('resize', this.handleResize);
-        this.handleResize();
+        window.addEventListener('resize', this.handleResize)
+        this.handleResize()
 
         fetch('dublin_attractions.json')
             .then(res => res.json())
-            .then(data => this.setState({locations: data}));
+            .then(data => this.setState({locations: data}))
     }
 
     componentWillUnmount() {
-        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('resize', this.handleResize)
     }
 
     handleResize() {
-        this.setState({isMobile: window.innerWidth <= 1080});
+        this.setState({isMobile: window.innerWidth <= 1080})
     }
 
     handleSearchChange(query) {
-        this.setState({searchQuery: query});
+        this.setState({searchQuery: query})
     }
 
     handleTagsSearch(query) {
-        this.setState({filterByTags: query});
+        this.setState({filterByTags: query})
     }
 
     handleSort(key) {
-        const direction = this.state.sortConfig.key === key && this.state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
-        this.setState({sortConfig: {key, direction}});
+        const direction = this.state.sortConfig.key === key && this.state.sortConfig.direction === 'asc' ? 'desc' : 'asc'
+        this.setState({sortConfig: {key, direction}})
     }
 
     handleShowModal(photos, location) {
-        this.setState({selectedPhotos: photos, currentLocation: location, showModal: true});
+        this.setState({selectedPhotos: photos, currentLocation: location, showModal: true})
     }
 
     handleShowDeleteModal(attractionID, attractionName) {
-        this.setState({showDeleteModal: true, deleteAttractionID: attractionID, deleteAttractionName: attractionName});
+        this.setState({showDeleteModal: true, deleteAttractionID: attractionID, deleteAttractionName: attractionName})
+    }
+
+    handleShowUpdateModal(attraction) {
+        this.setState({
+            selectedAttraction: attraction,
+            showUpdateModal: true,
+        })
     }
 
     handleFreeAttractions = (checked) => {
-        this.setState({filterByFreeAttractions: checked});
+        this.setState({filterByFreeAttractions: checked})
     }
 
     handleRatingAttractions = (checked) => {
-        this.setState({filterByRating: checked});
+        this.setState({filterByRating: checked})
     }
 
     closeModalInsertForm() {
@@ -106,18 +122,18 @@ class App extends React.Component {
             tags: newAttractionData.attrTags ? newAttractionData.attrTags.split(',') : [],
             rating: newAttractionData.attrRating,
             free: newAttractionData.attrFree,
-        };
+        }
 
         this.setState(prevState => {
-            const locations = [...prevState.locations];
-            const index = locations.findIndex(item => item.id === newAttraction.id);
+            const locations = [...prevState.locations]
+            const index = locations.findIndex(item => item.id === newAttraction.id)
             if (index !== -1) {
-                locations[index] = newAttraction;
+                locations[index] = newAttraction
             } else {
-                locations.push(newAttraction);
+                locations.push(newAttraction)
             }
-            return {locations};
-        });
+            return {locations}
+        })
     }
 
     handleDeleteElement(attractionID) {
@@ -125,7 +141,7 @@ class App extends React.Component {
             deleteAttraction: prevState.deleteAttraction.filter(attraction => attraction.id !== attractionID),
             locations: prevState.locations.filter(location => location.id !== attractionID),
             showDeleteModal: false,
-        }));
+        }))
     }
 
     handlePageChange = (pageNumber) => {
@@ -143,52 +159,58 @@ class App extends React.Component {
             postsPerPage,
             isMobile,
             sortConfig
-        } = this.state;
+        } = this.state
 
         const sortedLocations = [...locations].sort((a, b) => {
             if (sortConfig.key) {
-                const aValue = a[sortConfig.key] || '';
-                const bValue = b[sortConfig.key] || '';
-                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                const aValue = a[sortConfig.key] || ''
+                const bValue = b[sortConfig.key] || ''
+                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
             }
-            return 0;
-        });
+            return 0
+        })
 
         const searchFreeAttractions = (description) => {
             return description.toLowerCase().includes('free')
         }
 
         const getSortIcon = (columnName) => {
-            const {sortColumn, sortOrder} = this.state;
-            if (sortColumn !== columnName) {
-                return null;
+            if (sortConfig.key !== columnName) {
+                return null
             }
-            return sortOrder === 'asc' ? '▲' : '▼';
+            return sortConfig.direction === 'asc' ? '▲' : '▼'
         }
 
         const filteredLocations = sortedLocations.filter(location => {
-            const matchesSearchQuery = location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                location.address.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesSearchQuery = location?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                location?.address?.toLowerCase().includes(searchQuery.toLowerCase())
 
             const matchesTags = filterByTags ?
-                location.tags.some(tag => tag.toLowerCase().includes(filterByTags.toLowerCase())) :
-                true;
+                location?.tags?.some(tag => tag.toLowerCase().includes(filterByTags.toLowerCase())) :
+                true
 
             const matchesFreeAttractions = filterByFreeAttractions ?
-                location.description.toLowerCase().includes('free') :
-                true;
+                location?.description?.toLowerCase().includes('free') :
+                true
 
             const matchesRating = filterByRating ?
-                location.rating > 4.5 :
-                true;
+                location?.rating > 4.5 :
+                true
 
-            return matchesSearchQuery && matchesTags && matchesFreeAttractions && matchesRating;
-        });
+            return matchesSearchQuery && matchesTags && matchesFreeAttractions && matchesRating
+        })
 
-        const indexOfLastPost = currentPage * postsPerPage;
-        const indexOfFirstPost = indexOfLastPost - postsPerPage;
-        const currentPosts = isMobile ? filteredLocations : filteredLocations.slice(indexOfFirstPost, indexOfLastPost);
+        /**********************************************************************************************************
+         *                                  BELOW CODE CODE BASED ON:                                             *
+         * - https://medium.com/@techvoot.solutions/how-to-implement-pagination-in-your-react-js-e6b53043c84e     *
+         * - https://dev.to/canhamzacode/how-to-implement-pagination-with-reactjs-2b04                            *
+         *                                                                                                        *
+         **********************************************************************************************************/
+
+        const indexOfLastPost = currentPage * postsPerPage
+        const indexOfFirstPost = indexOfLastPost - postsPerPage
+        const currentPosts = isMobile ? filteredLocations : filteredLocations.slice(indexOfFirstPost, indexOfLastPost)
 
         return (
             <>
@@ -274,7 +296,18 @@ class App extends React.Component {
                                             </td>
                                             <td data-title="action-buttons">
                                                 <div className="button-group">
-                                                    {/*<ShowModalUpdateForm/>*/}
+                                                    <button
+                                                        className="update-button crud-buttons"
+                                                        onClick={() => this.handleShowUpdateModal(item)}
+                                                    >
+                                                        <img
+                                                            src="/src/assets/img/pencil.png"
+                                                            width="20"
+                                                            height="20"
+                                                            alt="pencil icon"
+                                                            title="Edit Element"
+                                                        />
+                                                    </button>
                                                     <DeleteModal
                                                         attractionID={item.id}
                                                         attractionName={item.name}
@@ -314,32 +347,40 @@ class App extends React.Component {
                         showModal={this.state.showModalInsertForm}
                         closeModal={this.closeModalInsertForm}
                     />
+
+                    {/* UPDATE MODAL */}
+                    <UpdateModal
+                        show={this.state.showUpdateModal}
+                        locationData={this.state.selectedAttraction}
+                        onClose={()=>this.setState({showUpdateModal: false})}
+                        onSubmit={this.handleFormSubmit}
+                    />
                 </div>
                 <PageFooter/>
             </>
-        );
+        )
     }
 }
 
 class PaginationComponent extends React.Component {
     constructor(props) {
-        super(props);
-        this.handlePageClick = this.handlePageClick.bind(this);
+        super(props)
+        this.handlePageClick = this.handlePageClick.bind(this)
     }
 
     calculatePaginationNumbers() {
-        const {totalItems, postsPerPage} = this.props;
-        const totalPages = Math.ceil(totalItems / postsPerPage);
-        return Array.from({length: totalPages}, (_, i) => i + 1);
+        const {totalItems, postsPerPage} = this.props
+        const totalPages = Math.ceil(totalItems / postsPerPage)
+        return Array.from({length: totalPages}, (_, i) => i + 1)
     }
 
     handlePageClick(pageNumber) {
-        this.props.onPageChange(pageNumber);
+        this.props.onPageChange(pageNumber)
     }
 
     render() {
-        const {currentPage} = this.props;
-        const paginationNumbers = this.calculatePaginationNumbers();
+        const {currentPage} = this.props
+        const paginationNumbers = this.calculatePaginationNumbers()
 
         return (
             <Pagination className="pagination-custom">
@@ -354,7 +395,7 @@ class PaginationComponent extends React.Component {
                     </Pagination.Item>
                 ))}
             </Pagination>
-        );
+        )
     }
 }
 
@@ -386,31 +427,31 @@ class ModalPictures extends React.Component {
 
 class DeleteModal extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
         this.state = {
             showDeleteModal: false,
-        };
-        this.handleShowModal = this.handleShowModal.bind(this);
-        this.handleCloseModal = this.handleCloseModal.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
+        }
+        this.handleShowModal = this.handleShowModal.bind(this)
+        this.handleCloseModal = this.handleCloseModal.bind(this)
+        this.handleDelete = this.handleDelete.bind(this)
     }
 
     handleShowModal() {
-        this.setState({showDeleteModal: true});
+        this.setState({showDeleteModal: true})
     }
 
     handleCloseModal() {
-        this.setState({showDeleteModal: false});
+        this.setState({showDeleteModal: false})
     }
 
     handleDelete() {
-        this.props.onDelete(this.props.attractionID);
-        this.handleCloseModal();
+        this.props.onDelete(this.props.attractionID)
+        this.handleCloseModal()
     }
 
     render() {
-        const {attractionName} = this.props;
-        const {showDeleteModal} = this.state;
+        const {attractionName} = this.props
+        const {showDeleteModal} = this.state
 
         return (
             <>
@@ -446,7 +487,7 @@ class DeleteModal extends React.Component {
                     </Modal.Footer>
                 </Modal>
             </>
-        );
+        )
     }
 }
 
@@ -482,44 +523,44 @@ class PageFooter extends React.Component {
 
 class SearchFilterSort extends Component {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             searchQuery: '',
             filterByTags: '',
             filterByFreeAttractions: false,
             filterByRating: false,
-        };
+        }
     }
 
     handleSearchChange = (query) => {
-        this.setState({searchQuery: query});
-        this.props.onSearch(query);
+        this.setState({searchQuery: query})
+        this.props.onSearch(query)
     }
 
     handleTagsSearch = (query) => {
-        this.setState({filterByTags: query});
-        this.props.onTagSearch(query);
+        this.setState({filterByTags: query})
+        this.props.onTagSearch(query)
     }
 
     handleFreeAttractions = () => {
         this.setState(prevState => {
-            const newState = {filterByFreeAttractions: !prevState.filterByFreeAttractions};
-            this.props.onFreeAttractions(newState.filterByFreeAttractions);
-            return newState;
-        });
+            const newState = {filterByFreeAttractions: !prevState.filterByFreeAttractions}
+            this.props.onFreeAttractions(newState.filterByFreeAttractions)
+            return newState
+        })
     }
 
     handleRatingAttractions = () => {
         this.setState(prevState => {
-            const newState = {filterByRating: !prevState.filterByRating};
-            this.props.onRatingAttractions(newState.filterByRating);
-            return newState;
-        });
+            const newState = {filterByRating: !prevState.filterByRating}
+            this.props.onRatingAttractions(newState.filterByRating)
+            return newState
+        })
     }
 
     render() {
-        const {searchQuery, filterByTags, filterByFreeAttractions, filterByRating} = this.state;
+        const {searchQuery, filterByTags, filterByFreeAttractions, filterByRating} = this.state
 
         return (
             <>
@@ -575,13 +616,13 @@ class SearchFilterSort extends Component {
                     </Form>
                 </div>
             </>
-        );
+        )
     }
 }
 
 class InsertForm extends React.Component {
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             formData: {
@@ -597,21 +638,21 @@ class InsertForm extends React.Component {
                 attrRating: 1,
                 attrFree: false
             },
-        };
+        }
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChange = this.handleChange.bind(this)
+        this.handleSubmit = this.handleSubmit.bind(this)
         this.handleUploadImage = this.handleUploadImage.bind(this)
     }
 
     handleChange(event) {
-        const {name, value, type, checked} = event.target;
+        const {name, value, type, checked} = event.target
         this.setState(prevState => ({
             formData: {
                 ...prevState.formData,
                 [name]: type === 'checkbox' ? checked : value,
             }
-        }));
+        }))
     }
 
     handleRatingChange(rating) {
@@ -620,23 +661,23 @@ class InsertForm extends React.Component {
                 ...prevData.formData,
                 attrRating: rating,
             }
-        }));
+        }))
     }
 
     handleUploadImage(event) {
-        const files = event.target.files;
-        const fileArray = Array.from(files);
+        const files = event.target.files
+        const fileArray = Array.from(files)
         this.setState(prevState => ({
             formData: {
                 ...prevState.formData,
                 attrPhotos: [...prevState.formData.attrPhotos, ...fileArray]
             }
-        }));
+        }))
     }
 
     handleSubmit(event) {
-        event.preventDefault();
-        this.props.handleFormSubmit(this.state.formData);
+        event.preventDefault()
+        this.props.handleFormSubmit(this.state.formData)
         this.props.closeModal()
     }
 
@@ -799,7 +840,222 @@ class InsertForm extends React.Component {
                     </form>
                 </Modal.Body>
             </Modal>
-        );
+        )
+    }
+}
+
+class UpdateModal extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            attrId: props.locationData?.id || '',
+            attrName: props.locationData?.name || '',
+            attrLatitude: props.locationData?.latitude || '',
+            attrLongitude: props.locationData?.longitude || '',
+            attrAddress: props.locationData?.address || '',
+            attrDescription: props.locationData?.description || '',
+            attrPhoneNumber: props.locationData?.phoneNumber || '',
+            attrTags: props.locationData?.tags ? props.locationData.tags.join(', ') : '',
+            attrRating: props.locationData?.rating || '',
+            attrFree: props.locationData?.free || false,
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.locationData && this.props.locationData !== prevProps.locationData) {
+            this.setState({
+                attrId: this.props.locationData.id || '',
+                attrName: this.props.locationData.name || '',
+                attrLatitude: this.props.locationData.latitude || '',
+                attrLongitude: this.props.locationData.longitude || '',
+                attrAddress: this.props.locationData.address || '',
+                attrDescription: this.props.locationData.description || '',
+                attrPhoneNumber: this.props.locationData.phoneNumber || '',
+                attrTags: this.props.locationData.tags ? this.props.locationData.tags.join(', ') : '',
+                attrRating: this.props.locationData.rating || '',
+                attrFree: this.props.locationData.free || false,
+            })
+        }
+    }
+
+    handleChange = (e) => {
+        const {name, value} = e.target
+        this.setState({[name]: value})
+    }
+
+    handlePhotoChange = (event) => {
+        const files = Array.from(event.target.files)
+        const photosURLs = files.map(file => URL.createObjectURL(file))
+        this.setState({photosURLs})
+    }
+
+    handleCheckboxChange = (e) => {
+        this.setState({attrRating: parseInt(e.target.value)})
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault()
+        const updatedData = {...this.state}
+        this.props.onSubmit(updatedData)
+    }
+
+    render() {
+        const {show, onClose} = this.props
+        return (
+            <Modal show={show} onHide={onClose} size={"xl"} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Update Attraction</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="row">
+                            <div className="col">
+                                <label htmlFor="attrId">Attraction ID</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrId"
+                                    value={this.state.attrId}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+
+                            <div className="col">
+                                <label htmlFor="attrName">Attraction Name</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrName"
+                                    value={this.state.attrName}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="row mt-2">
+                            <div className="col">
+                                <label htmlFor="attrLatitude">Latitude</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrLatitude"
+                                    value={this.state.attrLatitude}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+
+                            <div className="col">
+                                <label htmlFor="attrLongitude">Longitude</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrLongitude"
+                                    value={this.state.attrLongitude}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mt-2">
+                            <label htmlFor="attrAddress">Address</label>
+                            <input
+                                className="form-field w-100"
+                                type="text"
+                                name="attrAddress"
+                                value={this.state.attrAddress}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+
+                        <div className="mt-2">
+                            <label htmlFor="attrDescription">Description</label>
+                            <textarea
+                                className="form-control"
+                                name="attrDescription"
+                                cols="30"
+                                rows="5"
+                                value={this.state.attrDescription}
+                                onChange={this.handleChange}>
+                            </textarea>
+                        </div>
+
+                        <div className="mt-2">
+                            <label htmlFor="attrPhoneNumber">Phone Number</label>
+                            <input
+                                className="form-field w-100"
+                                type="text"
+                                name="attrPhoneNumber"
+                                value={this.state.attrPhoneNumber}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+
+                        <div className="row mt-2">
+                            <div className="col">
+                                <label htmlFor="attrPhotoURL">Photos</label>
+                                <input
+                                    className="form-control"
+                                    type="file"
+                                    name="attrPhotoURL"
+                                    multiple
+                                    onChange={this.handlePhotoChange}
+                                />
+                            </div>
+
+                            <div className="col">
+                                <label htmlFor="attrTags">Tags</label>
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="attrTags"
+                                    value={this.state.attrTags}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="mt-2">
+                            <div className="form-group">
+                                <label>Rating</label>
+                                <div>
+                                    {[1, 2, 3, 4, 5].map((num) => (
+                                        <label key={num} className="form-check form-check-inline">
+                                            <input
+                                                className="form-check-input"
+                                                type="radio"
+                                                name="attrRating"
+                                                value={num}
+                                                checked={this.state.attrRating === num}
+                                                onChange={(e) => this.handleCheckboxChange(e)}
+                                            />
+                                            {num}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-check-label" htmlFor="attrFree">
+                                    Free attraction?
+                                </label>
+                                <input
+                                    className="form-check-input ms-2"
+                                    type="checkbox"
+                                    name="attrFree"
+                                    checked={this.state.attrFree}
+                                    onChange={this.handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={onClose}>Close</Button>
+                            <Button variant="primary" type="submit">Update</Button>
+                        </Modal.Footer>
+                    </form>
+                </Modal.Body>
+            </Modal>
+        )
     }
 }
 
