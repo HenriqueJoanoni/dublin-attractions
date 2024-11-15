@@ -1,4 +1,4 @@
-import '../assets/scss/App.scss'
+import '../src/assets/scss/App.scss'
 import { useEffect, useState } from "react"
 import { Button, Carousel, Container, Form, Modal, Navbar, Spinner, Table, Pagination } from "react-bootstrap"
 
@@ -65,7 +65,7 @@ const App = () => {
 
     /** STATE FOR UPDATE BUTTON */
     const [updatedAttraction, setUpdatedAttraction] = useState([])
-    
+
     /** STATE FOR FILTER BY RATING */
     const [filterByRating, setFilterByRating] = useState(false)
 
