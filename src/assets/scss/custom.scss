@@ -1,6 +1,8 @@
+/* COLOR SCHEME: https://colorhunt.co/palette/16325b227b9478b7d0ffdc7f */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 @import "../../../node_modules/bootstrap/scss/bootstrap.scss";
 
-/** GENERAL */
+/** GENERAL COLORS */
 $primary-color: #16325B;
 $secondary-color: #227B94;
 $tertiary-color: #78B7D0;
@@ -13,3 +15,310 @@ $delete-button-hover-color: #AF1740;
 
 $default-font-color: #212529;
 $default-border-color: #dee2e6;
+
+/** ACCORDION SPECIFIC */
+$accordion-default-bg-color: $tertiary-color;
+$accordion-open-bg: $primary-color;
+$accordion-default-color: $default-font-color;
+$accordion-open-color: $background;
+
+$font-sans-serif: 'Roboto', sans-serif;
+
+$rgba1: rgba(0, 0, 0, 0.12);
+$rgba2: rgba(0, 0, 0, 0.1);
+$rgba3: rgba(0, 0, 0, 0.3);
+
+@mixin box-shadow($color1, $color2) {
+  box-shadow: 0 8px 20px $color1, 0 3px 6px $color2;
+}
+
+@mixin transition-effect($property, $duration: 0.5s) {
+  transition: $property $duration ease-in-out;
+}
+
+#root {
+  background-color: $background;
+}
+
+.header-logo {
+  display: flex;
+}
+
+.navbar-background {
+  --bs-bg-opacity: 1;
+  background-color: $primary-color;
+}
+
+.navbar-text-custom {
+  color: #FFF;
+  text-shadow: 1px 1px 2px #1a1d20;
+  line-height: 3;
+}
+
+.content-custom {
+  width: 100%;
+  padding-right: calc(1.5rem * 0.5);
+  padding-left: calc(1.5rem * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.search-field,
+.form-field {
+  display: block;
+  flex: 0 0 auto;
+  width: 25%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: $default-font-color;
+  appearance: none;
+  background-color: #FFF;
+  background-clip: padding-box;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.space-around {
+  margin: 1rem;
+}
+
+.spinner-custom {
+  color: $secondary-color !important;
+  margin: 10% 50% 10% 50%;
+}
+
+thead > tr > th,
+tbody > tr > td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.sort-row {
+  cursor: pointer;
+}
+
+footer {
+  background-color: $quaternary-color;
+  width: auto;
+  height: 5em;
+  color: $default-font-color;
+  font-size: 12px;
+  text-align: center;
+  padding: 1em;
+  @include box-shadow($rgba1, $rgba2);
+}
+
+.modal-display {
+  max-height: 500px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.modal-title {
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+
+  &:hover {
+    background-color: $secondary-color;
+    border-color: $secondary-color;
+    text-shadow: 1px 1px 2px #1a1d20;
+    @include box-shadow($rgba1, $rgba2);
+    @include transition-effect(all);
+  }
+}
+
+.btn-secondary {
+  background-color: $tertiary-color;
+  border-color: $tertiary-color;
+  color: #393e46;
+
+  &:hover {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    text-shadow: 1px 1px 2px #1a1d20;
+    @include box-shadow($rgba1, $rgba2);
+    @include transition-effect(all);
+  }
+}
+
+#custom-switch {
+  cursor: pointer;
+}
+
+/* OVERRIDING BOOTSTRAP VARIABLES */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-custom {
+  --bs-pagination-color: #16325B;
+  --bs-pagination-bg: #fafafa;
+  --bs-pagination-hover-color: #227B94;
+  --bs-pagination-focus-color: #227B94;
+  --bs-pagination-active-color: #fff;
+  --bs-pagination-active-bg: #16325B;
+  --bs-pagination-active-border-color: #16325B;
+}
+
+.active-pagination {
+  cursor: pointer;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.crud-buttons {
+  margin-left: 5px;
+  padding: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.insert-button {
+  width: 100px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: $secondary-color;
+  color: $background;
+  border: none;
+}
+
+.insert-button:hover {
+  background-color: $tertiary-color;
+  color: $background;
+  text-shadow: 1px 1px 2px #1a1d20;
+  @include box-shadow($rgba1, $rgba3);
+  transition: .5s;
+}
+
+.update-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: $quaternary-color;
+  border: none;
+}
+
+.update-button:hover {
+  background-color: $update-button-hover-color;
+  @include box-shadow($rgba1, $rgba3);
+  transition: .5s;
+}
+
+.delete-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  background-color: $delete-button-color;
+  color: $background;
+  border: none;
+}
+
+.delete-button:hover {
+  background-color: $delete-button-hover-color;
+  color: $background;
+  text-shadow: 1px 1px 2px #1a1d20;
+  @include box-shadow($rgba1, $rgba3);
+  transition: .5s;
+}
+
+.form-check-input:checked {
+  background-color: $primary-color !important;
+  border-color: $primary-color !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+textarea {
+  resize: none;
+}
+
+.accordion-button {
+  background-color: $accordion-default-bg-color;
+  color: $accordion-default-color;
+
+  &:not(.collapsed) {
+    background-color: $accordion-open-bg;
+    color: $accordion-open-color;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+}
+
+/* TABLE STACK CODE: https://stackoverflow.com/questions/28983809/how-to-make-a-table-responsive-stack-columns */
+@media only screen and (max-width: 1080px),
+only screen and (max-width: 900px),
+only screen and (max-width: 800px),
+only screen and (max-width: 600px) {
+
+  .pagination-container {
+    display: none;
+  }
+
+  .search-field {
+    width: 100%;
+  }
+
+  #responsive-table table,
+  #responsive-table thead,
+  #responsive-table tbody,
+  #responsive-table th,
+  #responsive-table td,
+  #responsive-table tr {
+    display: block;
+  }
+
+  #responsive-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  #responsive-table tr {
+    border: 1px solid #ccc;
+  }
+
+  #responsive-table td {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    position: relative;
+    padding-left: 50%;
+    white-space: normal;
+    text-align: left;
+  }
+
+  #responsive-table td:before {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  #responsive-table td:before {
+    content: attr(data-title);
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  footer {
+    width: auto;
+    height: 7em;
+  }
+}
