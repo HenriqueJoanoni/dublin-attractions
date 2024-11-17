@@ -1,7 +1,18 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom/client'
-import '../assets/scss/App.scss'
-import { Navbar, Container, Form, Button, Table, Spinner, Pagination, Modal, Carousel } from 'react-bootstrap'
+import '../assets/scss/custom.scss'
+import {
+    Accordion,
+    Navbar,
+    Container,
+    Form,
+    Button,
+    Table,
+    Spinner,
+    Pagination,
+    Modal,
+    Carousel
+} from 'react-bootstrap'
 
 class App extends React.Component {
     constructor(props) {
@@ -29,6 +40,7 @@ class App extends React.Component {
             postsPerPage: 10,
             currentPage: 1,
             isMobile: false,
+            showModalTagsManager: false,
         }
 
         this.handleResize = this.handleResize.bind(this)
@@ -106,6 +118,10 @@ class App extends React.Component {
 
     closeModalInsertForm() {
         this.setState({showModalInsertForm: false})
+    }
+
+    closeModalTagsManager() {
+        this.setState({showModalTagsManager: false})
     }
 
     handleFormSubmit(newAttractionData) {
@@ -220,18 +236,29 @@ class App extends React.Component {
                     <div className="row">
                         <SearchFilterSort
                             onSearch={this.handleSearchChange}
-                            onTagSearch={this.handleSearchChange}
+                            onTagSearch={this.handleTagsSearch}
                             onFreeAttractions={this.handleFreeAttractions}
                             onRatingAttractions={this.handleRatingAttractions}
                         />
 
                         <div className="col-lg-3 col-md-6 col-sm-12 d-flex align-items-center">
-                            <button
-                                className="insert-button"
-                                onClick={() => this.setState({showModalInsertForm: true})}
-                            >
-                                Insert new
-                            </button>
+                            <div className="mr-1">
+                                <button
+                                    className="insert-button"
+                                    onClick={() => this.setState({showModalInsertForm: true})}
+                                >
+                                    Insert new
+                                </button>
+                            </div>
+
+                            <div className="ms-1">
+                                <button
+                                    className="insert-button"
+                                    onClick={() => this.setState({showModalTagsManager: true})}
+                                >
+                                    Open tags manager
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -352,8 +379,15 @@ class App extends React.Component {
                     <UpdateModal
                         show={this.state.showUpdateModal}
                         locationData={this.state.selectedAttraction}
-                        onClose={()=>this.setState({showUpdateModal: false})}
+                        onClose={() => this.setState({showUpdateModal: false})}
                         onSubmit={this.handleFormSubmit}
+                    />
+
+                    {/* TAGS MANAGER MODAL */}
+                    <TagsManager
+                        show={this.state.showModalTagsManager}
+                        locationData={this.state.locations}
+                        onClose={() => this.setState({showModalTagsManager: false})}
                     />
                 </div>
                 <PageFooter/>
@@ -1053,6 +1087,84 @@ class UpdateModal extends React.Component {
                             <Button variant="primary" type="submit">Update</Button>
                         </Modal.Footer>
                     </form>
+                </Modal.Body>
+            </Modal>
+        )
+    }
+}
+
+class TagsManager extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            tagsGrouped: {},
+        }
+    }
+
+    componentDidMount() {
+        this.groupTags()
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.locationData !== this.props.locationData) {
+            this.groupTags()
+        }
+    }
+
+    groupTags() {
+        const {locationData} = this.props
+
+        if (!locationData || !Array.isArray(locationData)) return
+
+        const tagsGrouped = locationData.reduce((acc, location) => {
+            if (location.tags) {
+                location.tags.forEach(tag => {
+                    if (!acc[tag]) {
+                        acc[tag] = []
+                    }
+                    acc[tag].push(location)
+                })
+            }
+            return acc
+        }, {})
+
+        this.setState({tagsGrouped})
+    }
+
+    render() {
+        const {show, onClose} = this.props
+        const {tagsGrouped} = this.state
+
+        if (!show) return null
+
+        return (
+            <Modal show={show} onHide={onClose} size={"xl"} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Tags Manager</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Accordion>
+                        {Object.keys(tagsGrouped).length > 0 ? (
+                            Object.entries(tagsGrouped).map(([tag, locations], index) => (
+                                <Accordion.Item eventKey={index.toString()} key={tag}>
+                                    <Accordion.Header>
+                                        <b>
+                                            {tag.toUpperCase()}
+                                        </b>
+                                    </Accordion.Header>
+                                    <Accordion.Body>
+                                        <ul>
+                                            {locations.map(location => (
+                                                <li key={location.id}>{location.name}</li>
+                                            ))}
+                                        </ul>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))
+                        ) : (
+                            <p><b>No tags found.</b></p>
+                        )}
+                    </Accordion>
                 </Modal.Body>
             </Modal>
         )
